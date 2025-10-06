@@ -25,6 +25,22 @@ const router = Router();
  *           maximum: 100
  *           default: 10
  *         description: Number of items per page
+ *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *           enum: [admin, user, moderator, guest]
+ *         description: Filter by user role
+ *       - in: query
+ *         name: verified
+ *         schema:
+ *           type: boolean
+ *         description: Filter by verification status
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search users by name or email
  *     responses:
  *       200:
  *         description: Paginated list of users
@@ -41,15 +57,25 @@ const router = Router();
  *                       id:
  *                         type: string
  *                         format: uuid
- *                       name:
+ *                       firstName:
+ *                         type: string
+ *                       lastName:
  *                         type: string
  *                       email:
  *                         type: string
  *                         format: email
  *                       role:
  *                         type: string
- *                       status:
+ *                         enum: [admin, user, moderator, guest]
+ *                       isActive:
+ *                         type: boolean
+ *                       verified:
+ *                         type: boolean
+ *                       phoneNumber:
  *                         type: string
+ *                       dateOfBirth:
+ *                         type: string
+ *                         format: date
  *                       createdAt:
  *                         type: string
  *                         format: date-time
@@ -76,6 +102,9 @@ const router = Router();
 router.get("/", (req: Request, res: Response) => {
   const page = parseInt(req.query["page"] as string) || 1;
   const limit = parseInt(req.query["limit"] as string) || 10;
+  const role = req.query["role"] as string;
+  const verified = req.query["verified"] as string;
+  const search = req.query["search"] as string;
 
   const users = DataGenerator.generateArray(
     () => DataGenerator.generateUser(),
@@ -90,9 +119,90 @@ router.get("/", (req: Request, res: Response) => {
     total,
   );
 
-  response.message = "Users retrieved successfully";
+  // Add filter information to message
+  let message = "Users retrieved successfully";
+  const filters = [];
+  if (role) filters.push(`role: ${role}`);
+  if (verified) filters.push(`verified: ${verified}`);
+  if (search) filters.push(`search: ${search}`);
+
+  if (filters.length > 0) {
+    message += ` (filtered by ${filters.join(", ")})`;
+  }
+
+  response.message = message;
 
   res.json(response);
+});
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     firstName:
+ *                       type: string
+ *                     lastName:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                       format: email
+ *                     role:
+ *                       type: string
+ *                       enum: [admin, user, moderator, guest]
+ *                     isActive:
+ *                       type: boolean
+ *                     verified:
+ *                       type: boolean
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get("/:id", (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  // Mock user lookup
+  const user = DataGenerator.generateUser();
+  user.id = id as string;
+
+  res.json({
+    data: user,
+    success: true,
+    message: "User retrieved successfully",
+  });
 });
 
 export default router;

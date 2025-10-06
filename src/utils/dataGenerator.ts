@@ -7,6 +7,8 @@ import {
   Analytics,
   Article,
   Notification,
+  Subscription,
+  Team,
   SystemHealth,
   ApiResponse,
   PaginatedResponse,
@@ -16,11 +18,9 @@ export class DataGenerator {
   static generateUser(): User {
     const firstName = faker.name.firstName();
     const lastName = faker.name.lastName();
-    const username = faker.internet.userName(firstName, lastName);
 
     return {
       id: uuidv4(),
-      username,
       email: faker.internet.email(firstName, lastName),
       firstName,
       lastName,
@@ -28,16 +28,28 @@ export class DataGenerator {
       createdAt: faker.date.past(2).toISOString(),
       updatedAt: faker.date.recent(30).toISOString(),
       isActive: faker.datatype.boolean(),
-      role: faker.random.arrayElement(["admin", "user", "moderator"]),
+      role: faker.random.arrayElement(["admin", "user", "moderator", "guest"]),
+      phoneNumber: faker.datatype.boolean()
+        ? faker.phone.phoneNumber()
+        : undefined,
+      dateOfBirth: faker.datatype.boolean()
+        ? faker.date
+            .past(50, new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000))
+            .toISOString()
+            .split("T")[0]
+        : undefined,
+      verified: faker.datatype.boolean(),
       profile: {
         bio: faker.lorem.paragraph(),
         location: `${faker.address.city()}, ${faker.address.country()}`,
         website: faker.internet.url(),
         socialLinks: {
-          ...(faker.datatype.boolean() && { twitter: `@${username}` }),
+          ...(faker.datatype.boolean() && {
+            twitter: `@${faker.internet.userName()}`,
+          }),
           ...(faker.datatype.boolean() && { linkedin: faker.internet.url() }),
           ...(faker.datatype.boolean() && {
-            github: `https://github.com/${username}`,
+            github: `https://github.com/${faker.internet.userName()}`,
           }),
         },
       },
@@ -110,6 +122,16 @@ export class DataGenerator {
         reserved: faker.datatype.number({ min: 0, max: 50 }),
         available: faker.datatype.number({ min: 0, max: 950 }),
         lowStockThreshold: faker.datatype.number({ min: 5, max: 20 }),
+        warehouse: faker.datatype.boolean()
+          ? faker.random.arrayElement([
+              "North",
+              "South",
+              "East",
+              "West",
+              "Central",
+            ])
+          : undefined,
+        sku: faker.random.alphaNumeric(8).toUpperCase(),
       },
       ratings: {
         average: parseFloat(
@@ -170,13 +192,18 @@ export class DataGenerator {
       orderNumber: `ORD-${faker.datatype.number({ min: 100000, max: 999999 })}`,
       customerId: uuidv4(),
       status: faker.random.arrayElement([
-        "pending",
-        "processing",
+        "created",
+        "confirmed",
+        "in_fulfillment",
         "shipped",
-        "delivered",
+        "completed",
         "cancelled",
-        "refunded",
+        "returned",
       ]),
+      priority: faker.datatype.boolean()
+        ? faker.random.arrayElement(["standard", "express", "overnight"])
+        : undefined,
+      source: faker.random.arrayElement(["web", "mobile", "api", "admin"]),
       items,
       shipping: {
         address: {
@@ -558,5 +585,133 @@ export class DataGenerator {
   static generateArray<T>(generator: () => T, count?: number): T[] {
     const length = count || faker.datatype.number({ min: 5, max: 20 });
     return Array.from({ length }, generator);
+  }
+
+  static generateSubscription(): Subscription {
+    const billingCycle = faker.random.arrayElement([
+      "monthly",
+      "yearly",
+      "weekly",
+    ]) as "monthly" | "yearly" | "weekly";
+    const status = faker.random.arrayElement([
+      "active",
+      "cancelled",
+      "expired",
+      "trial",
+      "past_due",
+    ]) as "active" | "cancelled" | "expired" | "trial" | "past_due";
+    const currentPeriodStart = faker.date.past(1);
+    const currentPeriodEnd = new Date(currentPeriodStart);
+
+    // Add period based on billing cycle
+    if (billingCycle === "monthly") {
+      currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + 1);
+    } else if (billingCycle === "yearly") {
+      currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 1);
+    } else {
+      currentPeriodEnd.setDate(currentPeriodEnd.getDate() + 7);
+    }
+
+    const features = [
+      "api_access",
+      "premium_support",
+      "advanced_analytics",
+      "custom_integrations",
+      "white_label",
+      "priority_queue",
+      "bulk_operations",
+    ];
+
+    return {
+      id: uuidv4(),
+      userId: uuidv4(),
+      planId: `plan_${faker.random.alphaNumeric(8)}`,
+      status,
+      currentPeriodStart: currentPeriodStart.toISOString(),
+      currentPeriodEnd: currentPeriodEnd.toISOString(),
+      cancelledAt:
+        status === "cancelled"
+          ? faker.date.recent(30).toISOString()
+          : undefined,
+      trialEnd:
+        status === "trial" ? faker.date.future(0.1).toISOString() : undefined,
+      metadata: faker.datatype.boolean()
+        ? {
+            source: faker.random.arrayElement(["web", "mobile", "api"]),
+            campaign: faker.random.alphaNumeric(6),
+            referrer: faker.internet.url(),
+          }
+        : undefined,
+      features: faker.random.arrayElements(
+        features,
+        faker.datatype.number({ min: 2, max: 5 }),
+      ),
+      billingCycle,
+      amount: faker.datatype.number({ min: 999, max: 9999 }) / 100, // $9.99 to $99.99
+      currency: faker.random.arrayElement(["USD", "EUR", "GBP"]),
+      createdAt: faker.date.past(2).toISOString(),
+      updatedAt: faker.date.recent(30).toISOString(),
+    };
+  }
+
+  static generateTeam(): Team {
+    const name = faker.company.companyName();
+    const memberCount = faker.datatype.number({ min: 2, max: 20 });
+
+    const members = Array.from({ length: memberCount }, (_, index) => ({
+      userId: uuidv4(),
+      role: (index === 0
+        ? "owner"
+        : faker.random.arrayElement(["admin", "member", "viewer"])) as
+        | "owner"
+        | "admin"
+        | "member"
+        | "viewer",
+      joinedAt: faker.date.past(1).toISOString(),
+      permissions: faker.random.arrayElements(
+        [
+          "read",
+          "write",
+          "delete",
+          "admin",
+          "billing",
+          "invite_users",
+          "manage_settings",
+        ],
+        faker.datatype.number({ min: 1, max: 4 }),
+      ),
+    }));
+
+    return {
+      id: uuidv4(),
+      name,
+      slug: name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, ""),
+      description: faker.datatype.boolean()
+        ? faker.company.catchPhrase()
+        : undefined,
+      avatar: faker.datatype.boolean()
+        ? faker.image.business(200, 200)
+        : undefined,
+      ownerId: members[0]?.userId || uuidv4(),
+      members,
+      settings: {
+        visibility: faker.random.arrayElement(["private", "public"]),
+        allowInvites: faker.datatype.boolean(),
+        requireApproval: faker.datatype.boolean(),
+      },
+      plan: {
+        name: faker.random.arrayElement(["Starter", "Pro", "Enterprise"]),
+        limits: {
+          members: faker.datatype.number({ min: 5, max: 100 }),
+          projects: faker.datatype.number({ min: 3, max: 50 }),
+          storage: faker.datatype.number({ min: 1, max: 1000 }), // GB
+        },
+      },
+      createdAt: faker.date.past(2).toISOString(),
+      updatedAt: faker.date.recent(30).toISOString(),
+    };
   }
 }

@@ -30,6 +30,21 @@ const router = Router();
  *         schema:
  *           type: string
  *         description: Filter by product category
+ *       - in: query
+ *         name: inStock
+ *         schema:
+ *           type: boolean
+ *         description: Filter by stock availability
+ *       - in: query
+ *         name: brand
+ *         schema:
+ *           type: string
+ *         description: Filter by product brand
+ *       - in: query
+ *         name: warehouse
+ *         schema:
+ *           type: string
+ *         description: Filter by warehouse location
  *     responses:
  *       200:
  *         description: Paginated list of products
@@ -58,6 +73,10 @@ const router = Router();
  *                       inStock:
  *                         type: boolean
  *                       sku:
+ *                         type: string
+ *                       brand:
+ *                         type: string
+ *                       warehouse:
  *                         type: string
  *                       rating:
  *                         type: number
@@ -91,6 +110,9 @@ router.get("/", (req: Request, res: Response) => {
   const page = parseInt(req.query["page"] as string) || 1;
   const limit = parseInt(req.query["limit"] as string) || 10;
   const category = req.query["category"] as string;
+  const inStock = req.query["inStock"] as string;
+  const brand = req.query["brand"] as string;
+  const warehouse = req.query["warehouse"] as string;
 
   const products = DataGenerator.generateArray(
     () => DataGenerator.generateProduct(),
@@ -105,9 +127,19 @@ router.get("/", (req: Request, res: Response) => {
     total,
   );
 
-  response.message = category
-    ? `Products in category '${category}' retrieved successfully`
-    : "Products retrieved successfully";
+  // Add filter information to message
+  let message = "Products retrieved successfully";
+  const filters = [];
+  if (category) filters.push(`category: ${category}`);
+  if (inStock) filters.push(`inStock: ${inStock}`);
+  if (brand) filters.push(`brand: ${brand}`);
+  if (warehouse) filters.push(`warehouse: ${warehouse}`);
+
+  if (filters.length > 0) {
+    message += ` (filtered by ${filters.join(", ")})`;
+  }
+
+  response.message = message;
 
   res.json(response);
 });

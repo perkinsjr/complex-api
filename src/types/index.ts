@@ -1,6 +1,5 @@
 export interface User {
   id: string;
-  username: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -8,7 +7,10 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   isActive: boolean;
-  role: 'admin' | 'user' | 'moderator';
+  role: "admin" | "user" | "moderator" | "guest";
+  phoneNumber?: string;
+  dateOfBirth?: string;
+  verified: boolean;
   profile: {
     bio: string;
     location: string;
@@ -20,7 +22,7 @@ export interface User {
     };
   };
   preferences: {
-    theme: 'light' | 'dark' | 'auto';
+    theme: "light" | "dark" | "auto";
     notifications: {
       email: boolean;
       push: boolean;
@@ -56,6 +58,8 @@ export interface Product {
     reserved: number;
     available: number;
     lowStockThreshold: number;
+    warehouse?: string;
+    sku: string;
   };
   ratings: {
     average: number;
@@ -83,7 +87,16 @@ export interface Order {
   id: string;
   orderNumber: string;
   customerId: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+  status:
+    | "created"
+    | "confirmed"
+    | "in_fulfillment"
+    | "shipped"
+    | "completed"
+    | "cancelled"
+    | "returned";
+  priority?: "standard" | "express" | "overnight";
+  source: "web" | "mobile" | "api" | "admin";
   items: Array<{
     productId: string;
     productName: string;
@@ -106,8 +119,8 @@ export interface Order {
     trackingNumber?: string;
   };
   payment: {
-    method: 'credit_card' | 'paypal' | 'bank_transfer' | 'crypto';
-    status: 'pending' | 'completed' | 'failed' | 'refunded';
+    method: "credit_card" | "paypal" | "bank_transfer" | "crypto";
+    status: "pending" | "completed" | "failed" | "refunded";
     transactionId: string;
     amount: number;
     currency: string;
@@ -182,7 +195,7 @@ export interface Article {
   featured: boolean;
   publishedAt: string;
   updatedAt: string;
-  status: 'draft' | 'published' | 'archived';
+  status: "draft" | "published" | "archived";
   seo: {
     title: string;
     description: string;
@@ -206,19 +219,73 @@ export interface Article {
 export interface Notification {
   id: string;
   userId: string;
-  type: 'info' | 'success' | 'warning' | 'error' | 'promotion';
+  type:
+    | "info"
+    | "success"
+    | "warning"
+    | "error"
+    | "promotion"
+    | "system"
+    | "marketing";
   title: string;
   message: string;
   data?: Record<string, any>;
   isRead: boolean;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  channels: Array<'email' | 'push' | 'sms' | 'in_app'>;
+  priority: "low" | "medium" | "high" | "urgent";
+  channels: Array<"email" | "push" | "sms" | "in_app">;
   scheduledFor?: string;
   createdAt: string;
   readAt?: string;
   actionUrl?: string;
   actionText?: string;
   expiresAt?: string;
+  category?: string;
+  templateId?: string;
+  recipientCount?: number;
+}
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  planId: string;
+  status: "active" | "cancelled" | "expired" | "trial" | "past_due";
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  cancelledAt?: string;
+  trialEnd?: string;
+  metadata?: Record<string, any>;
+  features: string[];
+  billingCycle: "monthly" | "yearly" | "weekly";
+  amount: number;
+  currency: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  avatar?: string;
+  ownerId: string;
+  members: Array<{
+    userId: string;
+    role: "owner" | "admin" | "member" | "viewer";
+    joinedAt: string;
+    permissions: string[];
+  }>;
+  settings: {
+    visibility: "private" | "public";
+    allowInvites: boolean;
+    requireApproval: boolean;
+  };
+  plan: {
+    name: string;
+    limits: Record<string, number>;
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ApiResponse<T = any> {
@@ -260,14 +327,14 @@ export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
 }
 
 export interface SystemHealth {
-  status: 'healthy' | 'degraded' | 'down';
+  status: "healthy" | "degraded" | "down";
   timestamp: string;
   uptime: number;
   version: string;
   environment: string;
   services: Array<{
     name: string;
-    status: 'healthy' | 'degraded' | 'down';
+    status: "healthy" | "degraded" | "down";
     responseTime: number;
     lastCheck: string;
     details?: Record<string, any>;
@@ -289,7 +356,7 @@ export interface SystemHealth {
     };
   };
   database: {
-    status: 'connected' | 'disconnected' | 'error';
+    status: "connected" | "disconnected" | "error";
     responseTime: number;
     activeConnections: number;
     maxConnections: number;

@@ -95,7 +95,11 @@ const swaggerOptions = {
       { name: "Products", description: "Product catalog operations" },
       { name: "Orders", description: "Order management operations" },
       { name: "Analytics", description: "Analytics and metrics" },
-      { name: "Articles", description: "Content management operations" },
+      {
+        name: "Subscriptions",
+        description: "Subscription management operations",
+      },
+      { name: "Teams", description: "Team management operations" },
       { name: "Notifications", description: "Notification management" },
       { name: "Search", description: "Search functionality" },
       { name: "Reports", description: "Report generation and retrieval" },

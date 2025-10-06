@@ -26,10 +26,17 @@ const router = Router();
  *           default: 10
  *         description: Number of items per page
  *       - in: query
+ *         name: customerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Customer ID (required)
+ *       - in: query
  *         name: status
  *         schema:
  *           type: string
- *           enum: [pending, processing, shipped, delivered, cancelled]
+ *           enum: [created, confirmed, in_fulfillment, shipped, completed, cancelled, returned]
  *         description: Filter by order status
  *     responses:
  *       200:
@@ -54,7 +61,7 @@ const router = Router();
  *                         format: uuid
  *                       status:
  *                         type: string
- *                         enum: [pending, processing, shipped, delivered, cancelled]
+ *                         enum: [created, confirmed, in_fulfillment, shipped, completed, cancelled, returned]
  *                       total:
  *                         type: number
  *                         format: float
@@ -89,11 +96,27 @@ const router = Router();
  *                   type: boolean
  *                 message:
  *                   type: string
+ *       400:
+ *         description: Bad request - missing required customerId
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.get("/", (req: Request, res: Response) => {
   const page = parseInt(req.query["page"] as string) || 1;
   const limit = parseInt(req.query["limit"] as string) || 10;
+  const customerId = req.query["customerId"] as string;
   const status = req.query["status"] as string;
+
+  // Breaking change: customerId is now required
+  if (!customerId) {
+    return res.status(400).json({
+      data: null,
+      success: false,
+      message: "customerId parameter is required",
+    });
+  }
 
   const orders = DataGenerator.generateArray(
     () => DataGenerator.generateOrder(),
@@ -108,11 +131,15 @@ router.get("/", (req: Request, res: Response) => {
     total,
   );
 
-  response.message = status
-    ? `Orders with status '${status}' retrieved successfully`
-    : "Orders retrieved successfully";
+  // Add filter information to message
+  let message = `Orders for customer ${customerId} retrieved successfully`;
+  if (status) {
+    message += ` (filtered by status: ${status})`;
+  }
 
-  res.json(response);
+  response.message = message;
+
+  return res.json(response);
 });
 
 export default router;
