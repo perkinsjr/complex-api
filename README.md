@@ -36,7 +36,29 @@ A clean, production-ready Express TypeScript API with comprehensive OpenAPI docu
 - `GET /api/settings` - Application configuration
 
 ### Documentation
-- `GET /openapi.yaml` - OpenAPI specification in YAML format
+- `GET /openapi.yaml` - OpenAPI specification in YAML format (served from static file)
+
+## OpenAPI Specification
+
+The API documentation is generated from JSDoc comments in the source code and saved as a static `openapi.yaml` file at the project root. This file is:
+
+- **Generated automatically** during build/start processes
+- **Included in Docker builds** for containerized deployments
+- **Served statically** via the `/openapi.yaml` endpoint
+- **Used by Swagger UI** for interactive documentation at `/docs`
+
+### Generating OpenAPI Spec
+
+To manually generate or update the OpenAPI specification:
+
+```bash
+npm run generate:openapi
+```
+
+The specification is automatically generated before:
+- Building the project (`npm run build`)
+- Starting the server (`npm start`)
+- Starting development server (`npm run dev`)
 
 ## Quick Start
 
@@ -113,9 +135,12 @@ src/
 │   ├── reports.ts    # Report generation
 │   ├── integrations.ts # Third-party integrations
 │   ├── settings.ts   # Application settings
-│   └── openapi.ts    # OpenAPI spec endpoint
+│   └── openapi.ts    # OpenAPI spec endpoint (serves static file)
+├── scripts/          # Build and utility scripts
+│   └── generate-openapi.js # OpenAPI spec generation
 ├── types/            # TypeScript type definitions
 ├── utils/            # Utility functions and helpers
+└── openapi.yaml      # Generated OpenAPI specification (static file)
 └── index.ts          # Main application entry point
 ```
 

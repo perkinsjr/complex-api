@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
-import * as yaml from "js-yaml";
+import * as fs from "fs";
+import * as path from "path";
 
 const router = Router();
 
@@ -18,18 +19,26 @@ const router = Router();
  *               type: string
  */
 router.get("/openapi.yaml", (req: Request, res: Response) => {
-  // This will be populated by the swagger setup in the main app
-  const specs = (req.app as any).swaggerSpecs;
+  try {
+    const openapiPath = path.join(__dirname, "..", "..", "openapi.yaml");
 
-  if (!specs) {
+    if (!fs.existsSync(openapiPath)) {
+      return res.status(404).json({
+        success: false,
+        message: "OpenAPI specification file not found",
+      });
+    }
+
+    const yamlContent = fs.readFileSync(openapiPath, "utf8");
+    res.setHeader("Content-Type", "application/x-yaml");
+    return res.send(yamlContent);
+  } catch (error) {
+    console.error("Error reading OpenAPI file:", error);
     return res.status(500).json({
       success: false,
-      message: "OpenAPI specification not available",
+      message: "Unable to read OpenAPI specification",
     });
   }
-
-  res.setHeader("Content-Type", "application/x-yaml");
-  return res.send(yaml.dump(specs));
 });
 
 export default router;
