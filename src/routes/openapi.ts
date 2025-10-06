@@ -13,7 +13,7 @@ const router = Router();
  *       200:
  *         description: OpenAPI specification
  *         content:
- *           text/yaml:
+ *           application/x-yaml:
  *             schema:
  *               type: string
  */
@@ -28,7 +28,7 @@ router.get("/openapi.yaml", (req: Request, res: Response) => {
     });
   }
 
-  res.setHeader("Content-Type", "text/yaml");
+  res.setHeader("Content-Type", "application/x-yaml");
   return res.send(yaml.dump(specs));
 });
 
