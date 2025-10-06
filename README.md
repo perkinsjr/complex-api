@@ -36,7 +36,7 @@ A clean, production-ready Express TypeScript API with comprehensive OpenAPI docu
 - `GET /api/settings` - Application configuration
 
 ### Documentation
-- `GET /api/openapi.yaml` - OpenAPI specification in YAML format
+- `GET /openapi.yaml` - OpenAPI specification in YAML format
 
 ## Quick Start
 

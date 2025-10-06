@@ -29,5 +29,5 @@ export function setupRoutes(app: Express): void {
   app.use("/api/settings", settingsRoutes);
 
   // OpenAPI spec route
-  app.use("/api", openapiRoutes);
+  app.use("/", openapiRoutes);
 }

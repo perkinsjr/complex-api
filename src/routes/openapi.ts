@@ -5,7 +5,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/openapi.yaml:
+ * /openapi.yaml:
  *   get:
  *     summary: Get OpenAPI specification in YAML format
  *     tags: [Documentation]
