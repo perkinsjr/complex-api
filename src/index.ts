@@ -173,7 +173,7 @@ const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📚 API Documentation: http://localhost:${PORT}/docs`);
   console.log(`🏥 Health Check: http://localhost:${PORT}/health`);
-  console.log(`📋 OpenAPI Spec: http://localhost:${PORT}/api/openapi.yaml`);
+  console.log(`📋 OpenAPI Spec: http://localhost:${PORT}/openapi.yaml`);
   console.log(`🌍 Environment: ${process.env["NODE_ENV"] || "development"}`);
   console.log(`🔧 Process ID: ${process.pid}`);
 });

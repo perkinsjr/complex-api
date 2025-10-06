@@ -17,6 +17,9 @@ export function setupRoutes(app: Express): void {
   // Health check route (no /api prefix)
   app.use("/health", healthRoutes);
 
+  // OpenAPI spec route (at root level)
+  app.use("/", openapiRoutes);
+
   // API routes with /api prefix
   app.use("/api/users", usersRoutes);
   app.use("/api/products", productsRoutes);
@@ -29,7 +32,4 @@ export function setupRoutes(app: Express): void {
   app.use("/api/reports", reportsRoutes);
   app.use("/api/integrations", integrationsRoutes);
   app.use("/api/settings", settingsRoutes);
-
-  // OpenAPI spec route
-  app.use("/api", openapiRoutes);
 }
