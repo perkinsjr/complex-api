@@ -6,7 +6,7 @@ import swaggerUi from "swagger-ui-express";
 import { setupRoutes } from "./routes";
 
 const app = express();
-const PORT = process.env["PORT"] || 3000;
+const PORT = parseInt(process.env["PORT"] || "3000", 10);
 
 // Middleware
 app.use(helmet());
@@ -35,7 +35,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: process.env["API_URL"] || `http://localhost:${PORT}`,
+        url: process.env["API_URL"] || "/",
         description: "API server",
       },
     ],
@@ -104,7 +104,11 @@ const swaggerOptions = {
       { name: "Documentation", description: "API documentation" },
     ],
   },
-  apis: ["./src/routes/*.ts"],
+  apis: [
+    process.env["NODE_ENV"] === "production"
+      ? "./dist/routes/*.js"
+      : "./src/routes/*.ts",
+  ],
 };
 
 const specs = swaggerJsdoc(swaggerOptions);
@@ -161,11 +165,41 @@ app.use(
 );
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📚 API Documentation: http://localhost:${PORT}/docs`);
   console.log(`🏥 Health Check: http://localhost:${PORT}/health`);
   console.log(`📋 OpenAPI Spec: http://localhost:${PORT}/api/openapi.yaml`);
+  console.log(`🌍 Environment: ${process.env["NODE_ENV"] || "development"}`);
+  console.log(`🔧 Process ID: ${process.pid}`);
+});
+
+// Handle server startup errors
+server.on("error", (error: NodeJS.ErrnoException) => {
+  console.error("❌ Server startup error:", error);
+  if (error.code === "EADDRINUSE") {
+    console.error(`❌ Port ${PORT} is already in use`);
+  } else if (error.code === "EACCES") {
+    console.error(`❌ Permission denied to bind to port ${PORT}`);
+  }
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+  console.log("📴 SIGTERM received, shutting down gracefully");
+  server.close(() => {
+    console.log("💤 Server closed");
+    process.exit(0);
+  });
+});
+
+process.on("SIGINT", () => {
+  console.log("📴 SIGINT received, shutting down gracefully");
+  server.close(() => {
+    console.log("💤 Server closed");
+    process.exit(0);
+  });
 });
 
 export default app;
