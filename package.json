@@ -4,12 +4,8 @@
   "description": "A complex Express API with TypeScript and OpenAPI spec generation for Unkey deployment demo",
   "main": "dist/index.js",
   "scripts": {
-    "generate:openapi": "node scripts/generate-openapi.js",
-    "prebuild": "npm run generate:openapi",
     "build": "tsc",
-    "prestart": "npm run generate:openapi",
     "start": "node dist/index.js",
-    "predev": "npm run generate:openapi",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "lint": "eslint src/**/*.ts",
     "test": "jest"
