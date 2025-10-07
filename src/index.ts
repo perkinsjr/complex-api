@@ -26,7 +26,7 @@ const loadOpenAPISpec = () => {
     console.error("Error loading OpenAPI specification:", error);
     // Fallback to a minimal spec if file not found
     return {
-      openapi: "3.0.0",
+      openapi: "3.0.4",
       info: {
         title: "Complex API Demo",
         version: "1.0.0",
