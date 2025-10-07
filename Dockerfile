@@ -6,6 +6,9 @@ COPY package*.json ./
 
 RUN npm ci
 
+# Copy OpenAPI specification first to ensure it's available
+COPY openapi.yaml ./
+
 COPY . .
 
 RUN npm run build
