@@ -1,4 +1,4 @@
-openapi: "3.1.0"
+openapi: "3.0.4"
 info:
   title: Complex API Demo
   version: 1.0.0
@@ -22,7 +22,7 @@ components:
           oneOf:
             - type: object
             - type: array
-            - type: "null"
+            - type: "string"
         success:
           type: boolean
           example: true
@@ -63,7 +63,7 @@ components:
       type: object
       properties:
         data:
-          type: "null"
+          type: "string"
         success:
           type: boolean
           example: false
@@ -101,8 +101,6 @@ paths:
       summary: Get comprehensive system metrics and diagnostics
       tags:
         - Admin
-      security:
-        - BearerAuth: []
       parameters:
         - in: header
           name: x-admin-key
@@ -210,8 +208,6 @@ paths:
       summary: Comprehensive admin health check
       tags:
         - Admin
-      security:
-        - BearerAuth: []
       parameters:
         - in: header
           name: x-admin-key
@@ -951,7 +947,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: null
+                    type: "string"
                   success:
                     type: boolean
                     example: false
@@ -1061,7 +1057,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: null
+                    type: "string"
                   success:
                     type: boolean
                     example: false
@@ -1175,8 +1171,6 @@ paths:
       summary: Get paginated list of users
       tags:
         - Users
-      security:
-        - BearerAuth: []
       parameters:
         - in: query
           name: page
@@ -1257,8 +1251,6 @@ paths:
       summary: Get user by ID
       tags:
         - Users
-      security:
-        - BearerAuth: []
       parameters:
         - in: path
           name: id
@@ -1377,8 +1369,7 @@ paths:
                         updatedAt:
                           type: string
                           format: date-time
-                  pagination:
-                    $ref: "#/components/schemas/Pagination"
+
                   success:
                     type: boolean
                   message:
