@@ -555,8 +555,106 @@ export class DataGenerator {
     };
   }
 
-  static generateArray<T>(generator: () => T, count?: number): T[] {
-    const length = count || faker.datatype.number({ min: 5, max: 20 });
-    return Array.from({ length }, generator);
+  static generateArray<T>(generator: () => T, count: number): T[] {
+    return Array.from({ length: count }, generator);
+  }
+
+  static generateWebhook() {
+    const events = [
+      "user.created",
+      "user.updated",
+      "user.deleted",
+      "order.created",
+      "order.completed",
+      "order.cancelled",
+      "product.created",
+      "product.updated",
+      "notification.sent",
+    ];
+
+    const selectedEvents = faker.random.arrayElements(
+      events,
+      faker.datatype.number({ min: 1, max: 4 }),
+    );
+
+    return {
+      id: uuidv4(),
+      url: faker.internet.url(),
+      events: selectedEvents,
+      active: faker.datatype.boolean(),
+      description: faker.lorem.sentence(),
+      lastTriggered: faker.datatype.boolean()
+        ? faker.date.recent(7).toISOString()
+        : null,
+      createdAt: faker.date.past(1).toISOString(),
+      updatedAt: faker.date.recent(30).toISOString(),
+    };
+  }
+
+  static generateId(): string {
+    return uuidv4();
+  }
+
+  static isValidId(id: string): boolean {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(id);
+  }
+
+  static generateTimeSeries(period: string, granularity: string) {
+    const now = new Date();
+    const dataPoints: any[] = [];
+
+    // Determine number of data points and time interval
+    let days = 30;
+    let intervalMinutes = 24 * 60; // daily by default
+
+    switch (period) {
+      case "last_7_days":
+        days = 7;
+        break;
+      case "last_30_days":
+        days = 30;
+        break;
+      case "last_90_days":
+        days = 90;
+        break;
+      case "last_year":
+        days = 365;
+        break;
+    }
+
+    switch (granularity) {
+      case "hour":
+        intervalMinutes = 60;
+        break;
+      case "day":
+        intervalMinutes = 24 * 60;
+        break;
+      case "week":
+        intervalMinutes = 7 * 24 * 60;
+        break;
+      case "month":
+        intervalMinutes = 30 * 24 * 60;
+        break;
+    }
+
+    const totalDataPoints = Math.floor((days * 24 * 60) / intervalMinutes);
+
+    for (let i = totalDataPoints - 1; i >= 0; i--) {
+      const timestamp = new Date(now.getTime() - i * intervalMinutes * 60000);
+      dataPoints.push({
+        timestamp: timestamp.toISOString(),
+        users: faker.datatype.number({ min: 100, max: 1500 }),
+        revenue: faker.datatype.float({
+          min: 1000,
+          max: 15000,
+          precision: 0.01,
+        }),
+        orders: faker.datatype.number({ min: 10, max: 150 }),
+      });
+    }
+
+    return dataPoints;
   }
 }

@@ -10,6 +10,8 @@ import searchRoutes from "./search";
 import reportsRoutes from "./reports";
 import integrationsRoutes from "./integrations";
 import settingsRoutes from "./settings";
+import webhooksRoutes from "./webhooks";
+import adminRoutes from "./admin";
 import openapiRoutes from "./openapi";
 
 export function setupRoutes(app: Express): void {
@@ -27,6 +29,8 @@ export function setupRoutes(app: Express): void {
   app.use("/api/reports", reportsRoutes);
   app.use("/api/integrations", integrationsRoutes);
   app.use("/api/settings", settingsRoutes);
+  app.use("/api/webhooks", webhooksRoutes);
+  app.use("/api/admin", adminRoutes);
 
   // OpenAPI spec route
   app.use("/", openapiRoutes);

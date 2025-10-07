@@ -91,11 +91,50 @@ router.get("/", (req: Request, res: Response) => {
   const page = parseInt(req.query["page"] as string) || 1;
   const limit = parseInt(req.query["limit"] as string) || 10;
   const category = req.query["category"] as string;
+  const inStock = req.query["inStock"];
+  const minPrice = parseFloat(req.query["minPrice"] as string);
+  const maxPrice = parseFloat(req.query["maxPrice"] as string);
+  const minRating = parseFloat(req.query["minRating"] as string);
+  const sortBy = (req.query["sortBy"] as string) || "createdAt";
+  const sortOrder = (req.query["sortOrder"] as string) || "desc";
 
-  const products = DataGenerator.generateArray(
+  let products = DataGenerator.generateArray(
     () => DataGenerator.generateProduct(),
     limit,
   );
+
+  // Apply filters
+  products = products.filter((product: any) => {
+    if (category && product.category !== category) return false;
+    if (inStock !== undefined && product.inStock !== (inStock === "true"))
+      return false;
+    if (!isNaN(minPrice) && product.price < minPrice) return false;
+    if (!isNaN(maxPrice) && product.price > maxPrice) return false;
+    if (!isNaN(minRating) && product.rating < minRating) return false;
+    return true;
+  });
+
+  // Apply sorting
+  products.sort((a: any, b: any) => {
+    let aValue = a[sortBy];
+    let bValue = b[sortBy];
+
+    // Handle string comparison for name
+    if (sortBy === "name") {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+    }
+
+    // Handle date comparison
+    if (sortBy === "createdAt") {
+      aValue = new Date(aValue).getTime();
+      bValue = new Date(bValue).getTime();
+    }
+
+    const comparison = aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+    return sortOrder === "desc" ? -comparison : comparison;
+  });
+
   const total = 5000; // Mock total count
 
   const response = DataGenerator.createPaginatedResponse(
@@ -105,9 +144,19 @@ router.get("/", (req: Request, res: Response) => {
     total,
   );
 
-  response.message = category
-    ? `Products in category '${category}' retrieved successfully`
-    : "Products retrieved successfully";
+  // Build dynamic message based on applied filters
+  const filters = [];
+  if (category) filters.push(`category: ${category}`);
+  if (inStock !== undefined) filters.push(`inStock: ${inStock}`);
+  if (!isNaN(minPrice)) filters.push(`minPrice: ${minPrice}`);
+  if (!isNaN(maxPrice)) filters.push(`maxPrice: ${maxPrice}`);
+  if (!isNaN(minRating)) filters.push(`minRating: ${minRating}`);
+
+  const filterText =
+    filters.length > 0 ? ` with filters (${filters.join(", ")})` : "";
+  const sortText = ` sorted by ${sortBy} (${sortOrder})`;
+
+  response.message = `Products retrieved successfully${filterText}${sortText}`;
 
   res.json(response);
 });
