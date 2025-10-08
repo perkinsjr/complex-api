@@ -3,41 +3,7 @@ import { DataGenerator } from "../utils/dataGenerator";
 
 const router = Router();
 
-// Authentication middleware
-const requireAuth = (req: Request, res: Response, next: any): void => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({
-      data: null,
-      success: false,
-      message: "Authorization header with Bearer token is required",
-    });
-    return;
-  }
-
-  const token = authHeader.substring(7);
-  if (!token || token.length < 10) {
-    res.status(401).json({
-      data: null,
-      success: false,
-      message: "Invalid or missing authentication token",
-    });
-    return;
-  }
-
-  // Mock token validation - in real implementation, validate JWT or API key
-  if (token === "invalid_token") {
-    res.status(403).json({
-      data: null,
-      success: false,
-      message: "Invalid authentication token",
-    });
-    return;
-  }
-
-  next();
-};
+// No authentication required - removed Bearer Auth
 
 /**
  * @swagger
@@ -45,8 +11,7 @@ const requireAuth = (req: Request, res: Response, next: any): void => {
  *   get:
  *     summary: Get paginated list of users
  *     tags: [Users]
- *     security:
- *       - BearerAuth: []
+
  *     parameters:
  *       - in: query
  *         name: page
@@ -123,7 +88,7 @@ const requireAuth = (req: Request, res: Response, next: any): void => {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get("/", requireAuth, (req: Request, res: Response) => {
+router.get("/", (req: Request, res: Response) => {
   const page = parseInt(req.query["page"] as string) || 1;
   const limit = parseInt(req.query["limit"] as string) || 10;
 
@@ -151,8 +116,7 @@ router.get("/", requireAuth, (req: Request, res: Response) => {
  *   get:
  *     summary: Get user by ID
  *     tags: [Users]
- *     security:
- *       - BearerAuth: []
+
  *     parameters:
  *       - in: path
  *         name: id
@@ -204,12 +168,10 @@ router.get("/", requireAuth, (req: Request, res: Response) => {
  *                   type: string
  *       400:
  *         description: Bad request - invalid user ID format
- *       401:
- *         description: Unauthorized - missing or invalid authentication
  *       404:
  *         description: User not found
  */
-router.get("/:id", requireAuth, (req: Request, res: Response): void => {
+router.get("/:id", (req: Request, res: Response): void => {
   const { id } = req.params;
 
   // Validate UUID format

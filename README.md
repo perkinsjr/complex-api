@@ -1,17 +1,19 @@
 # Express TypeScript API Demo
 
-A clean, production-ready Express TypeScript API with comprehensive OpenAPI documentation, designed for deployment on Unkey's cloud platform.
+A clean, production-ready Express TypeScript API with comprehensive OpenAPI documentation and **no authentication requirements**, designed for easy deployment and testing.
 
 ## Features
 
 - **Express.js** with TypeScript for type-safe backend development
-- **OpenAPI 3.0** specification with Swagger UI documentation
+- **OpenAPI 3.0** specification with automatic generation from code annotations
+- **No Authentication Required** - All endpoints are publicly accessible
+- **Dynamic OpenAPI Generation** - Spec updates automatically with code changes
 - **Modular route structure** with organized endpoint separation
 - **Security middleware** with Helmet for HTTP security headers
 - **Compression middleware** for optimized response sizes
 - **Health check endpoint** for monitoring and deployment readiness
 - **Docker support** for containerized deployment
-- **Production-ready** configuration for Unkey platform
+- **Development tools** with auto-regenerating documentation
 
 ## API Endpoints
 
@@ -36,18 +38,42 @@ A clean, production-ready Express TypeScript API with comprehensive OpenAPI docu
 - `GET /api/settings` - Application configuration
 
 ### Documentation
-- `GET /openapi.yaml` - OpenAPI specification in YAML format (served from static file)
+- `GET /openapi.yaml` - OpenAPI specification in YAML format (dynamically generated)
+- `GET /openapi.json` - OpenAPI specification in JSON format (dynamically generated)
+
+## Authentication
+
+**No authentication is required** for any endpoint in this API. All Bearer Auth requirements have been removed to simplify testing and deployment. The API is designed to be publicly accessible for demonstration purposes.
 
 ## OpenAPI Specification
 
-The API documentation is generated from JSDoc comments in the source code and saved as a static `openapi.yaml` file at the project root. This file is:
+The API documentation is automatically generated from JSDoc comments in the route files using swagger-jsdoc. The specification is:
 
-- **Generated automatically** during build/start processes
-- **Included in Docker builds** for containerized deployments
-- **Served statically** via the `/openapi.yaml` endpoint
+- **Generated dynamically** from code annotations on each request
+- **Always up-to-date** with the current codebase
+- **Available in multiple formats** (YAML and JSON)
+- **Served via live endpoints** that reflect real-time code changes
 - **Used by Swagger UI** for interactive documentation at `/docs`
 
-### Generating OpenAPI Spec
+### Generating Static OpenAPI Files
+
+To generate static OpenAPI files for external use:
+
+```bash
+# Generate both openapi.yaml and openapi.json files
+npm run generate:openapi
+
+# Development with auto-regeneration on file changes
+npm run dev:watch
+```
+
+### Development Workflow
+
+1. **Standard development**: `npm run dev` - Generates spec once at startup
+2. **Watch mode**: `npm run dev:watch` - Automatically regenerates spec when route files change
+3. **Manual generation**: `npm run generate:openapi` - Generate static files on demand
+
+The OpenAPI specification is automatically generated before every build, ensuring deployed versions always have current documentation.
 
 To manually generate or update the OpenAPI specification:
 
@@ -221,4 +247,4 @@ MIT License - see LICENSE file for details.
 
 ---
 
-Built with ❤️ for deployment on [Unkey](https://unkey.dev) - the modern cloud platform for auto-scaling applications.
+Built with ❤️ for deployment on [Unkey](https://unkey.dev) - the modern API developer platform

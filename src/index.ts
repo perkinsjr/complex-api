@@ -2,9 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import compression from "compression";
 import swaggerUi from "swagger-ui-express";
-import * as yaml from "js-yaml";
-import * as fs from "fs";
-import * as path from "path";
+import swaggerJSDoc from "swagger-jsdoc";
 import { setupRoutes } from "./routes";
 
 const app = express();
@@ -16,28 +14,53 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Load static OpenAPI specification
-const loadOpenAPISpec = () => {
+// Generate dynamic OpenAPI specification
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.4",
+    info: {
+      title: "Complex API Demo",
+      version: "1.0.0",
+      description:
+        "A comprehensive API demonstration for Unkey deployment showcase",
+      contact: {
+        name: "Unkey Team",
+        url: "https://unkey.dev",
+        email: "support@unkey.dev",
+      },
+      license: {
+        name: "MIT",
+        url: "https://opensource.org/licenses/MIT",
+      },
+    },
+    servers: [
+      {
+        url: "/",
+        description: "API server",
+      },
+    ],
+  },
+  apis: ["./src/routes/*.ts"],
+};
+
+const generateOpenAPISpec = () => {
   try {
-    const openapiPath = path.join(__dirname, "..", "openapi.yaml");
-    const yamlContent = fs.readFileSync(openapiPath, "utf8");
-    return yaml.load(yamlContent) as any;
+    return swaggerJSDoc(swaggerOptions);
   } catch (error) {
-    console.error("Error loading OpenAPI specification:", error);
-    // Fallback to a minimal spec if file not found
+    console.error("Error generating OpenAPI spec:", error);
     return {
-      openapi: "3.0.0",
+      openapi: "3.0.4",
       info: {
         title: "Complex API Demo",
         version: "1.0.0",
-        description: "API specification not available",
+        description: "Error generating API specification",
       },
       paths: {},
     };
   }
 };
 
-const specs = loadOpenAPISpec();
+const specs = generateOpenAPISpec();
 
 // API Documentation
 app.use(
@@ -92,7 +115,8 @@ const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📚 API Documentation: http://localhost:${PORT}/docs`);
   console.log(`🏥 Health Check: http://localhost:${PORT}/health`);
-  console.log(`📋 OpenAPI Spec: http://localhost:${PORT}/openapi.yaml`);
+  console.log(`📋 OpenAPI Spec (YAML): http://localhost:${PORT}/openapi.yaml`);
+  console.log(`📋 OpenAPI Spec (JSON): http://localhost:${PORT}/openapi.json`);
   console.log(`🌍 Environment: ${process.env["NODE_ENV"] || "development"}`);
   console.log(`🔧 Process ID: ${process.pid}`);
 });
