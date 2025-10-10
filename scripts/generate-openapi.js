@@ -86,7 +86,8 @@ const swaggerOptions = {
           type: "object",
           properties: {
             data: {
-              type: "null",
+              type: "string",
+              nullable: true,
             },
             success: {
               type: "boolean",
