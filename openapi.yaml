@@ -1,4 +1,4 @@
-openapi: "3.0.4"
+openapi: 3.0.4
 info:
   title: Complex API Demo
   version: 1.0.0
@@ -22,7 +22,8 @@ components:
           oneOf:
             - type: object
             - type: array
-            - type: "string"
+              items: {}
+          nullable: true
         success:
           type: boolean
           example: true
@@ -35,7 +36,7 @@ components:
         - message
     PaginatedResponse:
       allOf:
-        - $ref: "#/components/schemas/ApiResponse"
+        - $ref: '#/components/schemas/ApiResponse'
         - type: object
           properties:
             pagination:
@@ -63,7 +64,8 @@ components:
       type: object
       properties:
         data:
-          type: "string"
+          type: object
+          nullable: true
         success:
           type: boolean
           example: false
@@ -114,7 +116,7 @@ paths:
             default: last_30_days
           description: Time period for analytics data
       responses:
-        "200":
+        '200':
           description: Analytics data
           content:
             application/json:
@@ -207,7 +209,7 @@ paths:
             type: boolean
           description: Filter by featured articles only
       responses:
-        "200":
+        '200':
           description: Paginated list of articles
           content:
             application/json:
@@ -277,7 +279,7 @@ paths:
       tags:
         - Health
       responses:
-        "200":
+        '200':
           description: System health information
           content:
             application/json:
@@ -320,7 +322,7 @@ paths:
       tags:
         - Integrations
       responses:
-        "200":
+        '200':
           description: List of integrations
           content:
             application/json:
@@ -416,7 +418,7 @@ paths:
             type: boolean
           description: Filter by unread notifications only
       responses:
-        "200":
+        '200':
           description: Paginated list of notifications
           content:
             application/json:
@@ -488,12 +490,37 @@ paths:
       tags:
         - Documentation
       responses:
-        "200":
+        '200':
           description: OpenAPI specification
           content:
             application/x-yaml:
               schema:
                 type: string
+  /openapi.json:
+    get:
+      summary: Get OpenAPI specification in JSON format
+      tags:
+        - Documentation
+      responses:
+        '200':
+          description: OpenAPI specification in JSON format
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: OpenAPI specification file not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: OpenAPI specification file not found
   /api/orders:
     get:
       summary: Get paginated list of orders
@@ -527,7 +554,7 @@ paths:
               - cancelled
           description: Filter by order status
       responses:
-        "200":
+        '200':
           description: Paginated list of orders
           content:
             application/json:
@@ -616,7 +643,7 @@ paths:
             type: string
           description: Filter by product category
       responses:
-        "200":
+        '200':
           description: Paginated list of products
           content:
             application/json:
@@ -712,7 +739,7 @@ paths:
             default: json
           description: Report output format
       responses:
-        "200":
+        '200':
           description: Generated report data
           content:
             application/json:
@@ -755,7 +782,7 @@ paths:
                     example: true
                   message:
                     type: string
-        "400":
+        '400':
           description: Bad request - missing or invalid parameters
           content:
             application/json:
@@ -763,7 +790,8 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: "string"
+                    type: object
+                    nullable: true
                   success:
                     type: boolean
                     example: false
@@ -809,7 +837,7 @@ paths:
             default: 10
           description: Number of items per page
       responses:
-        "200":
+        '200':
           description: Search results
           content:
             application/json:
@@ -865,7 +893,7 @@ paths:
                     type: boolean
                   message:
                     type: string
-        "400":
+        '400':
           description: Bad request - missing search query
           content:
             application/json:
@@ -873,7 +901,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: "string"
+                    type: null
                   success:
                     type: boolean
                     example: false
@@ -899,7 +927,7 @@ paths:
               - billing
           description: Filter settings by category
       responses:
-        "200":
+        '200':
           description: Application settings
           content:
             application/json:
@@ -1004,7 +1032,7 @@ paths:
             default: 10
           description: Number of items per page
       responses:
-        "200":
+        '200':
           description: Paginated list of users
           content:
             application/json:

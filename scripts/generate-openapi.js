@@ -1,12 +1,12 @@
-const swaggerJsdoc = require('swagger-jsdoc');
-const yaml = require('js-yaml');
-const fs = require('fs');
-const path = require('path');
+const swaggerJsdoc = require("swagger-jsdoc");
+const yaml = require("js-yaml");
+const fs = require("fs");
+const path = require("path");
 
 // Swagger configuration - matches the one from src/index.ts
 const swaggerOptions = {
   definition: {
-    openapi: "3.0.0",
+    openapi: "3.0.4",
     info: {
       title: "Complex API Demo",
       version: "1.0.0",
@@ -34,7 +34,8 @@ const swaggerOptions = {
           type: "object",
           properties: {
             data: {
-              oneOf: [{ type: "object" }, { type: "array" }, { type: "null" }],
+              oneOf: [{ type: "object" }, { type: "array", items: {} }],
+              nullable: true,
             },
             success: {
               type: "boolean",
@@ -71,7 +72,10 @@ const swaggerOptions = {
         Error: {
           type: "object",
           properties: {
-            data: { type: "null" },
+            data: {
+              type: "object",
+              nullable: true,
+            },
             success: { type: "boolean", example: false },
             message: { type: "string", example: "An error occurred" },
           },
@@ -97,7 +101,7 @@ const swaggerOptions = {
 };
 
 try {
-  console.log('🔄 Generating OpenAPI specification...');
+  console.log("🔄 Generating OpenAPI specification...");
 
   // Generate the OpenAPI spec
   const specs = swaggerJsdoc(swaggerOptions);
@@ -110,14 +114,15 @@ try {
   });
 
   // Write to openapi.yaml in the root directory
-  const outputPath = path.join(__dirname, '..', 'openapi.yaml');
-  fs.writeFileSync(outputPath, yamlString, 'utf8');
+  const outputPath = path.join(__dirname, "..", "openapi.yaml");
+  fs.writeFileSync(outputPath, yamlString, "utf8");
 
-  console.log('✅ OpenAPI specification generated successfully!');
+  console.log("✅ OpenAPI specification generated successfully!");
   console.log(`📁 File saved to: ${outputPath}`);
-  console.log(`📊 Generated spec contains ${Object.keys(specs.paths || {}).length} endpoints`);
-
+  console.log(
+    `📊 Generated spec contains ${Object.keys(specs.paths || {}).length} endpoints`,
+  );
 } catch (error) {
-  console.error('❌ Error generating OpenAPI specification:', error);
+  console.error("❌ Error generating OpenAPI specification:", error);
   process.exit(1);
 }

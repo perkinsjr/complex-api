@@ -89,7 +89,8 @@ const router = Router();
  *               type: object
  *               properties:
  *                 data:
- *                   type: null
+ *                   type: object
+ *                   nullable: true
  *                 success:
  *                   type: boolean
  *                   example: false
