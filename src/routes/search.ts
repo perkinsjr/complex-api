@@ -103,15 +103,30 @@ const router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: string
- *                   nullable: true
  *                 success:
  *                   type: boolean
  *                   example: false
  *                 message:
  *                   type: string
  *                   example: "Search query is required"
+ *                 error:
+ *                   type: object
+ *                   properties:
+ *                     code:
+ *                       type: string
+ *                     message:
+ *                       type: string
+ *                 metadata:
+ *                   type: object
+ *                   properties:
+ *                     timestamp:
+ *                       type: string
+ *                       format: date-time
+ *                     requestId:
+ *                       type: string
+ *                       format: uuid
+ *                     version:
+ *                       type: string
  */
 router.get("/", (req: Request, res: Response) => {
   const query = req.query["q"] as string;

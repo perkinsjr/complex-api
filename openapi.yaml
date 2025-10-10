@@ -56,19 +56,41 @@ components:
     Error:
       type: object
       properties:
-        data:
-          type: string
-          nullable: true
         success:
           type: boolean
           example: false
         message:
           type: string
           example: An error occurred
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: UNKNOWN_ERROR
+            message:
+              type: string
+              example: An error occurred
+          required:
+            - code
+            - message
+        metadata:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+            requestId:
+              type: string
+              format: uuid
+            version:
+              type: string
+              example: v1.0.0
       required:
-        - data
         - success
         - message
+        - error
+        - metadata
     User:
       type: object
       properties:
@@ -1045,14 +1067,29 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:
-                    type: string
-                    nullable: true
                   success:
                     type: boolean
                     example: false
                   message:
                     type: string
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      message:
+                        type: string
+                  metadata:
+                    type: object
+                    properties:
+                      timestamp:
+                        type: string
+                        format: date-time
+                      requestId:
+                        type: string
+                        format: uuid
+                      version:
+                        type: string
   /api/search:
     get:
       summary: Search across different content types
@@ -1156,15 +1193,30 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:
-                    type: string
-                    nullable: true
                   success:
                     type: boolean
                     example: false
                   message:
                     type: string
                     example: Search query is required
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      message:
+                        type: string
+                  metadata:
+                    type: object
+                    properties:
+                      timestamp:
+                        type: string
+                        format: date-time
+                      requestId:
+                        type: string
+                        format: uuid
+                      version:
+                        type: string
   /api/settings:
     get:
       summary: Get application settings

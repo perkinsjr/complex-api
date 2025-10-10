@@ -85,10 +85,6 @@ const swaggerOptions = {
         Error: {
           type: "object",
           properties: {
-            data: {
-              type: "string",
-              nullable: true,
-            },
             success: {
               type: "boolean",
               example: false,
@@ -97,8 +93,39 @@ const swaggerOptions = {
               type: "string",
               example: "An error occurred",
             },
+            error: {
+              type: "object",
+              properties: {
+                code: {
+                  type: "string",
+                  example: "UNKNOWN_ERROR",
+                },
+                message: {
+                  type: "string",
+                  example: "An error occurred",
+                },
+              },
+              required: ["code", "message"],
+            },
+            metadata: {
+              type: "object",
+              properties: {
+                timestamp: {
+                  type: "string",
+                  format: "date-time",
+                },
+                requestId: {
+                  type: "string",
+                  format: "uuid",
+                },
+                version: {
+                  type: "string",
+                  example: "v1.0.0",
+                },
+              },
+            },
           },
-          required: ["data", "success", "message"],
+          required: ["success", "message", "error", "metadata"],
         },
         User: {
           type: "object",
