@@ -81,7 +81,7 @@ router.get("/", (req: Request, res: Response) => {
     () => DataGenerator.generateUser(),
     limit,
   );
-  const total = 1000; // Mock total count
+  const total = 5; // Mock total count
 
   const response = DataGenerator.createPaginatedResponse(
     users,
