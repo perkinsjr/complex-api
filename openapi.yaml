@@ -13,8 +13,35 @@ info:
 servers:
   - url: /
     description: API server
+security:
+  - BearerAuth: []
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bearer token authentication. Include your API token in the Authorization header:
+        `Authorization: Bearer <your-token>`
   schemas:
+    UnauthorizedError:
+      type: object
+      properties:
+        data:
+          type: object
+          nullable: true
+          example: null
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Authorization header is required
+      required:
+        - data
+        - success
+        - message
     ApiResponse:
       type: object
       properties:
@@ -36,7 +63,7 @@ components:
         - message
     PaginatedResponse:
       allOf:
-        - $ref: '#/components/schemas/ApiResponse'
+        - $ref: "#/components/schemas/ApiResponse"
         - type: object
           properties:
             pagination:
@@ -116,7 +143,7 @@ paths:
             default: last_30_days
           description: Time period for analytics data
       responses:
-        '200':
+        "200":
           description: Analytics data
           content:
             application/json:
@@ -209,7 +236,7 @@ paths:
             type: boolean
           description: Filter by featured articles only
       responses:
-        '200':
+        "200":
           description: Paginated list of articles
           content:
             application/json:
@@ -278,8 +305,9 @@ paths:
       summary: Get system health status
       tags:
         - Health
+      security: []
       responses:
-        '200':
+        "200":
           description: System health information
           content:
             application/json:
@@ -322,7 +350,7 @@ paths:
       tags:
         - Integrations
       responses:
-        '200':
+        "200":
           description: List of integrations
           content:
             application/json:
@@ -418,7 +446,7 @@ paths:
             type: boolean
           description: Filter by unread notifications only
       responses:
-        '200':
+        "200":
           description: Paginated list of notifications
           content:
             application/json:
@@ -489,8 +517,9 @@ paths:
       summary: Get OpenAPI specification in YAML format
       tags:
         - Documentation
+      security: []
       responses:
-        '200':
+        "200":
           description: OpenAPI specification
           content:
             application/x-yaml:
@@ -501,14 +530,15 @@ paths:
       summary: Get OpenAPI specification in JSON format
       tags:
         - Documentation
+      security: []
       responses:
-        '200':
+        "200":
           description: OpenAPI specification in JSON format
           content:
             application/json:
               schema:
                 type: object
-        '404':
+        "404":
           description: OpenAPI specification file not found
           content:
             application/json:
@@ -554,7 +584,7 @@ paths:
               - cancelled
           description: Filter by order status
       responses:
-        '200':
+        "200":
           description: Paginated list of orders
           content:
             application/json:
@@ -643,7 +673,7 @@ paths:
             type: string
           description: Filter by product category
       responses:
-        '200':
+        "200":
           description: Paginated list of products
           content:
             application/json:
@@ -739,7 +769,7 @@ paths:
             default: json
           description: Report output format
       responses:
-        '200':
+        "200":
           description: Generated report data
           content:
             application/json:
@@ -782,7 +812,7 @@ paths:
                     example: true
                   message:
                     type: string
-        '400':
+        "400":
           description: Bad request - missing or invalid parameters
           content:
             application/json:
@@ -837,7 +867,7 @@ paths:
             default: 10
           description: Number of items per page
       responses:
-        '200':
+        "200":
           description: Search results
           content:
             application/json:
@@ -893,7 +923,7 @@ paths:
                     type: boolean
                   message:
                     type: string
-        '400':
+        "400":
           description: Bad request - missing search query
           content:
             application/json:
@@ -927,7 +957,7 @@ paths:
               - billing
           description: Filter settings by category
       responses:
-        '200':
+        "200":
           description: Application settings
           content:
             application/json:
@@ -1032,7 +1062,7 @@ paths:
             default: 10
           description: Number of items per page
       responses:
-        '200':
+        "200":
           description: Paginated list of users
           content:
             application/json:

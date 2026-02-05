@@ -1,4 +1,5 @@
 import { Express } from "express";
+import { requireBearerToken } from "../middleware/auth";
 import healthRoutes from "./health";
 import usersRoutes from "./users";
 import productsRoutes from "./products";
@@ -13,21 +14,21 @@ import settingsRoutes from "./settings";
 import openapiRoutes from "./openapi";
 
 export function setupRoutes(app: Express): void {
-  // Health check route (no /api prefix)
+  // Health check route (no /api prefix, no auth required)
   app.use("/health", healthRoutes);
 
-  // API routes with /api prefix
-  app.use("/api/users", usersRoutes);
-  app.use("/api/products", productsRoutes);
-  app.use("/api/orders", ordersRoutes);
-  app.use("/api/analytics", analyticsRoutes);
-  app.use("/api/articles", articlesRoutes);
-  app.use("/api/notifications", notificationsRoutes);
-  app.use("/api/search", searchRoutes);
-  app.use("/api/reports", reportsRoutes);
-  app.use("/api/integrations", integrationsRoutes);
-  app.use("/api/settings", settingsRoutes);
-
-  // OpenAPI spec route
+  // OpenAPI spec route (no auth required for documentation)
   app.use("/", openapiRoutes);
+
+  // API routes with /api prefix - all require Bearer token authentication
+  app.use("/api/users", requireBearerToken, usersRoutes);
+  app.use("/api/products", requireBearerToken, productsRoutes);
+  app.use("/api/orders", requireBearerToken, ordersRoutes);
+  app.use("/api/analytics", requireBearerToken, analyticsRoutes);
+  app.use("/api/articles", requireBearerToken, articlesRoutes);
+  app.use("/api/notifications", requireBearerToken, notificationsRoutes);
+  app.use("/api/search", requireBearerToken, searchRoutes);
+  app.use("/api/reports", requireBearerToken, reportsRoutes);
+  app.use("/api/integrations", requireBearerToken, integrationsRoutes);
+  app.use("/api/settings", requireBearerToken, settingsRoutes);
 }
