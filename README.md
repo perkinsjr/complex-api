@@ -8,7 +8,7 @@ A clean, production-ready Express TypeScript API with comprehensive OpenAPI docu
 - **OpenAPI 3.0** specification with Swagger UI documentation
 - **Modular route structure** with organized endpoint separation
 - **Security middleware** with Helmet for HTTP security headers
-- **Compression middleware** for optimized response sizes
+- **Compression middleware** for optimized response sizes    
 - **Health check endpoint** for monitoring and deployment readiness
 - **Docker support** for containerized deployment
 - **Production-ready** configuration for Unkey platform
