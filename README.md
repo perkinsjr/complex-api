@@ -4,6 +4,9 @@ A clean, production-ready Express TypeScript API with comprehensive OpenAPI docu
 
 ## Features
 
+
+
+
 - **Express.js** with TypeScript for type-safe backend development
 - **OpenAPI 3.0** specification with Swagger UI documentation
 - **Modular route structure** with organized endpoint separation
